@@ -1,0 +1,10 @@
+(define (my-even? x)
+  (if (< x 2)
+      (= x 0)
+      (my-even? (- x 2))))
+(define (my-odd? x)
+  (not (my-even? x)))
+(define (power b e)
+  (if (= e 0)
+      1
+      (* b (power b (- e 1)))))
