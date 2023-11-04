@@ -2,6 +2,8 @@
 
 long long gorner (long long arr[], long long x, long long len)
 {
+	if (len == 1)
+		return arr[0];
 	long long px = arr[0]*x + arr[1];
 	for (int i = 2; i < len; i++){
 		px = px*x + arr[i];
@@ -15,6 +17,7 @@ long long gornerdx (long long arr[], long long x, long long len)
 	{
 		arr[i] = arr[i]*(len - 1 - i);
 	}
+
 	return gorner(arr, x, len-1);
 }
 
@@ -28,7 +31,7 @@ int main()
 		scanf("%lld", &arr_a[i]);
 	}
 
-	printf("%lld\n", gorner(arr_a,x,n+1));
-	printf("%lld", gornerdx(arr_a,x,n+1));
+	printf("%lld ", gorner(arr_a,x,n+1));
+	printf("%lld\n", gornerdx(arr_a,x,n+1));
 	return 0;
 }
