@@ -20,7 +20,7 @@ int main()
     {   
         if ((int)pow(2,i) == (ans & (int)pow(2,i)))
         {
-            printf("%d\n", i); 
+            printf("%d ", i); 
         }
     }
 }
