@@ -39,13 +39,13 @@ char *fibstr(int n)
     {
         printf("iter %d\n", i);
         // printf("1) %s\n", si_1);
-        realloc(si_2, strlen(si_1)+1);
+        si_2 = realloc(si_2, strlen(si_1)+1);
         strcpy(si_2, si_1);
-        realloc(si_1, strlen(si)+1);
+        si_1 = realloc(si_1, strlen(si)+1);
         // printf("2) %s\n", si_1);
         strcpy(si_1,si);
         // printf("3) %s\n", si_1);
-        realloc(si, strlen(si_2)+strlen(si_1)+1);
+        si = realloc(si, strlen(si_2)+strlen(si_1)+1);
         if (!si)
             printf("ERROR");
         
