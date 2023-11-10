@@ -5,6 +5,7 @@ int main(int argc, char const *argv[])
 {
 	int x;
 	scanf("%d", &x);
+	if (x < 0) x =  - x;
 	int sieve[N] = {0};
 	sieve[0] = 1;
 	sieve[1] = 1;
