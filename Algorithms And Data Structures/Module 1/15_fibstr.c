@@ -33,11 +33,11 @@ char *fibstr(int n)
 
     char *si = (char*)malloc(strlen(si_2)+strlen(si_1)+1);
     conc(si_2, si_1, si);
-    printf("%s\n", si);
+    //printf("%s\n", si);
     int i = 3;
     while (i < n)
     {
-        printf("iter %d\n", i);
+        //printf("iter %d\n", i);
         // printf("1) %s\n", si_1);
         si_2 = realloc(si_2, strlen(si_1)+1);
         strcpy(si_2, si_1);
@@ -65,7 +65,7 @@ int main()
     int n;
     scanf("%d", &n);
     printf("%s\n", fibstr(n));
-    printf("check2\n");
+    //printf("check2\n");
 
     return 0;
 }
