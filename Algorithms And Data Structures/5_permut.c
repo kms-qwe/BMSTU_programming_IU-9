@@ -33,30 +33,26 @@ int main()
                 cB[i][1] += 1;
         }
     }
-    /*for(int i =0; i <8; i++)
-    {
-        printf("cA[%d] = %lld %lld\n", i, cA[i][0], cA[i][1]);
-        printf("cB[%d] = %lld %lld\n", i, cB[i][0], cB[i][1]);
-    }*/
-    bool fl = true;
+
+    bool is_permut = true;
     for(int i = 0; i< 8; i++)
     {
-        bool flag = false;
+        bool a_i_in_B = false;
         for(int j = 0;j<8;j++)
         {
             if (cA[i][0] == cB[j][0] && cA[i][1] == cB[j][1])
             {
-                flag = true;
+                a_i_in_B = true;
                 break;
             }
         }
-        if (! flag)
+        if (! a_i_in_B)
         {
-            fl = false;
+            is_permut = false;
             break;
         }
     }
-    if (fl)
+    if (is_permut)
         printf("yes");
     else
         printf("no");

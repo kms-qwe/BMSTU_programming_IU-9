@@ -4,11 +4,14 @@
 
 char *concat(char **s, int n)
 {
-    char *res = (char*)malloc(n*2000);
+    int N = 0;
+    for(int i = 0; i < n; i++)
+        N += strlen(s[i]);
+    char *res = (char*)malloc(N+1);
     int top = 0;
     for(int i = 0; i < n; i++)
     {
-        for(int j =0; (j < 10000) && (s[i][j] != '\0'); j++)
+        for(int j =0; (j < N) && (s[i][j] != '\0'); j++)
         {
             memcpy((void *)(res + top), (const void*)&s[i][j], 1);
             top += 1;
@@ -20,22 +23,25 @@ char *concat(char **s, int n)
 int main()
 {
     int n;
-    scanf("%d", &n);
+    scanf("%d ", &n);
     char *s[n];
 
+    if (n == 0)
+        return 0;
     for(int i = 0; i < n; i++)
     {
-        s[i] = (char*)malloc(2000);
+        s[i] = (char*)malloc(1100);
     }
 
-    fflush(stdin);
     for(int i = 0; i < n; i++)
     {
-        gets(s[i]);
+        fgets(s[i], 1100, stdin);
+        if (s[i][strlen(s[i]) - 1] == '\n')
+            s[i][strlen(s[i]) - 1] = '\0';
     }
-
- 
-    printf("\n%s\n", concat(s, n));
+    char *res = concat(s,n);
+    printf("\n%s\n", res);
+    free(res);
     for(int i = 0; i< n; i++)
     {
         free(s[i]);

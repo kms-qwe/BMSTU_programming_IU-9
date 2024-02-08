@@ -2,15 +2,15 @@
 
 void fib_sys_print (unsigned long x)
 {
-	if (x == 0)
-	{
-		printf("%d", 0);
-	}
+    if (x == 0)
+    {
+        printf("%d", 0);
+    }
     int ans[100] = {0};
     int mx_ind = 0;
     while (x > 0)
     {
-    unsigned long long fib_0[2] = {0, 1}, fib_1[2] = {1, 1}, fib_2[2] = {2, 2};
+        unsigned long long fib_0[2] = {0, 1}, fib_1[2] = {1, 1}, fib_2[2] = {2, 2};
         while (fib_2[1] <= x)
         {
             fib_0[1] = fib_1[1]; fib_0[0] += 1;

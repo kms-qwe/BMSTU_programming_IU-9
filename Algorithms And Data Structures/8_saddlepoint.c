@@ -26,10 +26,17 @@ int main(int argc, char const *argv[])
 		for(int j = 0; j < M; ++j)
 		{
 			max_in_row[i] = (max_in_row[i] < arr[i][j]) ? arr[i][j] : max_in_row[i];
+			// printf("%d %d %d %d %d\n", i, j, arr[i][j], min_in_colomn[j], min_in_colomn[j] > arr[i][j]);
 			min_in_colomn[j] = (min_in_colomn[j] > arr[i][j]) ? arr[i][j] : min_in_colomn[j];
 		}
 
-	any_in( min_in_colomn, max_in_row, N, M);
+	// for(int i = 0; i < N; i++)
+	// 	printf("%d\t", max_in_row[i]);
+	// printf("\n");
+	// for(int i = 0; i < M; i++)
+	// 	printf("%d\t", min_in_colomn[i]);
+	// printf("\n");
+	any_in(min_in_colomn, max_in_row, M, N);
 
 	return 0;
 }
@@ -50,9 +57,9 @@ int any_in(int *A, int *B, int len_A, int len_B)
 	for(int i = 0; i < len_A; ++i)
 		if (find(*(A + i), B, len_B))
 			{
-				printf("%d", i);
+				printf("%d\n", i);
 				return 1;
 			}
-	printf("none");
+	printf("none\n");
 	return 0; 
 }
