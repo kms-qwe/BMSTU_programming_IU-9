@@ -1,3 +1,5 @@
 .vscode/
 go.mod
-Discrete\ Math/*.!(go)
+Discrete\ Math/Module\ 1*.!(go)
+Discrete\ Math/Module\ 2*.!(go)
+Discrete\ Math/Module\ 3*.!(go)
