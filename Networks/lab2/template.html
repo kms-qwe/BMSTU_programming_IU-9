@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Курсы валют</title>
+</head>
+<body>
+    <h1>Таблица курсов валют</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Код</th>
+                <th>Номинал</th>
+                <th>Название</th>
+                <th>Курс ЦБ</th>
+                <th>Изменение</th>
+                <th>Изменение (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .}}
+            <tr>
+                <td>{{.Code}}</td> 
+                <td>{{.Nominal}}</td> 
+                <td>{{.Name}}</td> 
+                <td>{{.Rate}}</td> 
+                <td>{{.Change}}</td> 
+                <td>{{.ChangePercent}}</td> 
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="6">Нет данных</td> 
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</body>
+</html>

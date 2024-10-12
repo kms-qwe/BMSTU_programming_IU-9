@@ -1,2 +1,7 @@
 .vscode/
 go.mod
+go.sum
+Assembler/TASM/*
+!Assembler/TASM/*.asm
+Programming Languages/C++/let6/*
+Programming Languages/C++/let6b/*
