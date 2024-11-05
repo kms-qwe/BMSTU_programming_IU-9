@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Dashboard</title>
+</head>
+<body>
+
+    <h1>WebSocket Dashboard</h1>
+
+    <div>
+        <h2>Server 1 (localhost:8093/webSocket):</h2>
+        <ul id="server1"></ul>
+    </div>
+
+    <div>
+        <h2>Server 2 (localhost:8094):</h2>
+        <ul id="server2"></ul>
+    </div>
+
+    <script>
+        function connectWebSocket(serverIp, elementId) {
+            const ws = new WebSocket('ws://' + serverIp);
+
+            ws.onopen = function() {
+                console.log('Connected to ' + serverIp);
+            };
+
+            ws.onmessage = function(event) {
+                const messageList = document.getElementById(elementId);
+                const newMessage = document.createElement('li');
+                newMessage.textContent = event.data;
+                messageList.appendChild(newMessage);
+            };
+
+            ws.onerror = function(error) {
+                console.log('WebSocket Error: ', error);
+            };
+
+            ws.onclose = function() {
+                console.log('Connection closed to ' + serverIp);
+                setTimeout(function() {
+                    connectWebSocket(serverIp, elementId);
+                }, 5000);
+            };
+        }
+
+        connectWebSocket('localhost:8093/webSocket', 'server1');
+        connectWebSocket('localhost:8094', 'server2');
+    </script>
+
+</body>
+</html>
