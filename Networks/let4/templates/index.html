@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Почтовый клиент</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .email-list {
+            list-style: none;
+            padding: 0;
+        }
+        .email-item {
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete-btn {
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .delete-all-btn {
+            background-color: #cc0000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Почтовый ящик</h1>
+    <form action="/delete-all" method="GET">
+        <button type="submit" class="delete-all-btn">Удалить все письма</button>
+    </form>
+    
+    <div class="email-list">
+        {{range .}}
+        <div class="email-item">
+            <div class="email-header">
+                <div>
+                    <strong>От:</strong> {{.From}}<br>
+                    <strong>Тема:</strong> {{.Subject}}
+                </div>
+                <form action="/delete" method="GET" style="display: inline;">
+                    <input type="hidden" name="id" value="{{.ID}}">
+                    <button type="submit" class="delete-btn">Удалить</button>
+                </form>
+            </div>
+        </div>
+        {{end}}
+    </div>
+</body>
+</html>

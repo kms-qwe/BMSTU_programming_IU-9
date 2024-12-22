@@ -1,0 +1,39 @@
+<!-- templates/view.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Просмотр письма</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .email-content {
+            white-space: pre-wrap;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-btn">← Назад к списку</a>
+    
+    <h2>{{.Subject}}</h2>
+    <p><strong>От:</strong> {{.From}}</p>
+    
+    <div class="email-content">
+        {{.Body}}
+    </div>
+</body>
+</html>
