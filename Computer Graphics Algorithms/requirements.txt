@@ -1,3 +1,7 @@
+DiscoverVersion==0.2.6
 glfw==2.8.0
+NuMPI==0.6.1
+numpy==2.2.2
 PyOpenGL==3.1.9
 PyOpenGL-accelerate==3.1.9
+scipy==1.15.1
