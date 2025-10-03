@@ -20,9 +20,6 @@ T = \left\{
 \right.
 \]
 
-
-
-
 Алфавит:  
 \(\Sigma = \{A,B,C,D,E,F,G,H,I,J,Q\}\)
 

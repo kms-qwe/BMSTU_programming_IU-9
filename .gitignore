@@ -6,5 +6,5 @@ Assembler/TASM/*
 Programming Languages/C++/let6/*
 Programming Languages/C++/let6b/*
 **/venv/
-**/.idea/
-**/bin/target/
+.idea/
+target/
