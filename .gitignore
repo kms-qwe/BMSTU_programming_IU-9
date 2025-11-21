@@ -8,3 +8,4 @@ Programming Languages/C++/let6b/*
 **/venv/
 .idea/
 target/
+**/.venv/
