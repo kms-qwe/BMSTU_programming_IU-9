@@ -1,12 +1,10 @@
 import math
 import pyglet
 
-# ----- ВАЖНО ДЛЯ RETINA / HiDPI -----
 pyglet.options.dpi_scaling = "stretch"
 
 from pyglet import shapes
 
-# ================== НАСТРАИВАЕМЫЕ ПАРАМЕТРЫ ==================
 
 # Границы видимой области по x и y: [-L, L]
 L = 10.0
@@ -46,13 +44,11 @@ POTENTIAL_COLOR_MAX = 4.0
 
 # Список исходных зарядов: (x, y, q)
 INITIAL_CHARGES = [
-    (-1.5, 0.0, +2.0),
-    (1.5, 0.0, -2.0),
-    (0.0, 1.5, +1.0),
-    (0.0, -1.5, -1.0),
-    (-3.0, -3.5, -1.0),
-    (4.0, 3.5, +2.0)
-
+    (-1.5, -1.5, +2.0),
+    (1.5, -1.5, +2.0),
+    (-2.0, 2.0, -1.0),
+    (-4.5, -4.5, -2.0),
+    (0.0, 0.0, -1.0),
 ]
 
 
@@ -92,30 +88,25 @@ class FieldSimulationWindow(pyglet.window.Window):
             resizable=False,
         )
 
-        # тёмный фон вокруг поля
         pyglet.gl.glClearColor(0.06, 0.06, 0.08, 1.0)
 
         self.field_pixel_size = WINDOW_FIELD_SIZE
         self.legend_width = LEGEND_WIDTH
         self.L = L
 
-        # Один общий Batch + слои (Group) для порядка отрисовки
         self.batch = pyglet.graphics.Batch()
-        self.group_background = pyglet.graphics.Group(order=0)   # градиент потенциала
-        self.group_fieldlines = pyglet.graphics.Group(order=1)   # линии напряжённости
-        self.group_axes = pyglet.graphics.Group(order=2)         # оси, насечки, подписи
-        self.group_charges = pyglet.graphics.Group(order=3)      # заряды
-        self.group_legend = pyglet.graphics.Group(order=4)       # легенда
+        self.group_background = pyglet.graphics.Group(order=0)
+        self.group_fieldlines = pyglet.graphics.Group(order=1)
+        self.group_axes = pyglet.graphics.Group(order=2)
+        self.group_charges = pyglet.graphics.Group(order=3)
+        self.group_legend = pyglet.graphics.Group(order=4)
 
-        # Ссылка на все объекты осей (чтоб их не съел GC)
         self.axes_drawables: list[object] = []
 
-        # ---------- Заряды ----------
         self.charges: list[Charge] = []
         for x, y, q in INITIAL_CHARGES:
             self.add_charge(x, y, q)
 
-        # ---------- Сетка потенциальных точек (для раскраски) ----------
         self.grid_resolution = N_GRID
         self.grid_dx = (2.0 * self.L) / self.grid_resolution
         self.x_world = [
@@ -129,24 +120,18 @@ class FieldSimulationWindow(pyglet.window.Window):
             0.0 for _ in range(self.grid_resolution * self.grid_resolution)
         ]
         self.potential_cells: list[shapes.Rectangle] = []
-        self.global_vmax = 1.0  # диапазон для легенды
+        self.global_vmax = 1.0
 
         self._create_potential_cells()
         self._create_axes()
         self._create_legend_shapes()
 
-        # Линии поля (streamlines)
         self.streamline_shapes: list[shapes.MultiLine] = []
 
-        # Таймеры
         self.time_accumulator = 0.0
         self.time_since_field_update = 0.0
 
         pyglet.clock.schedule_interval(self.update_simulation, 1.0 / 60.0)
-
-    # =========================================================
-    #           КООРДИНАТЫ
-    # =========================================================
 
     def world_to_screen(self, x: float, y: float) -> tuple[float, float]:
         sx = (x + self.L) / (2.0 * self.L) * self.field_pixel_size
@@ -157,10 +142,6 @@ class FieldSimulationWindow(pyglet.window.Window):
         x = sx / self.field_pixel_size * (2.0 * self.L) - self.L
         y = sy / self.field_pixel_size * (2.0 * self.L) - self.L
         return x, y
-
-    # =========================================================
-    #           СОЗДАНИЕ ОБЪЕКТОВ
-    # =========================================================
 
     def add_charge(self, x: float, y: float, q: float) -> None:
         charge = Charge(x, y, q)
@@ -208,8 +189,6 @@ class FieldSimulationWindow(pyglet.window.Window):
         label_values = [-self.L, -self.L / 2.0, 0.0, self.L / 2.0, self.L]
         tick_size = 10.0
 
-        # ----- ОСИ X и Y -----
-        # Ось X: y = 0
         sx1, sy1 = self.world_to_screen(-self.L, 0.0)
         sx2, sy2 = self.world_to_screen(self.L, 0.0)
         axis_x = shapes.Line(
@@ -224,7 +203,6 @@ class FieldSimulationWindow(pyglet.window.Window):
         )
         self.axes_drawables.append(axis_x)
 
-        # Ось Y: x = 0
         sx1, sy1 = self.world_to_screen(0.0, -self.L)
         sx2, sy2 = self.world_to_screen(0.0, self.L)
         axis_y = shapes.Line(
@@ -239,9 +217,6 @@ class FieldSimulationWindow(pyglet.window.Window):
         )
         self.axes_drawables.append(axis_y)
 
-        # ----- НАСЕЧКИ И ПОДПИСИ -----
-
-        # X-ось: вертикальные насечки
         for xv in label_values:
             sx, sy = self.world_to_screen(xv, 0.0)
             tick = shapes.Line(
@@ -256,14 +231,13 @@ class FieldSimulationWindow(pyglet.window.Window):
             )
             self.axes_drawables.append(tick)
 
-        # Числовые подписи для оси X — ПОД осью
         for xv in label_values:
             sx, sy = self.world_to_screen(xv, 0.0)
             label = pyglet.text.Label(
                 f"{xv:.1f}",
                 font_size=11,
                 x=sx,
-                y=sy - tick_size - 4,  # чуть ниже оси
+                y=sy - tick_size - 4,
                 anchor_x="center",
                 anchor_y="top",
                 color=(0, 0, 0, 255),
@@ -272,7 +246,6 @@ class FieldSimulationWindow(pyglet.window.Window):
             )
             self.axes_drawables.append(label)
 
-        # Y-ось: горизонтальные насечки
         for yv in label_values:
             sx, sy = self.world_to_screen(0.0, yv)
             tick = shapes.Line(
@@ -287,13 +260,12 @@ class FieldSimulationWindow(pyglet.window.Window):
             )
             self.axes_drawables.append(tick)
 
-        # Числовые подписи для оси Y — СПРАВА от оси
         for yv in label_values:
             sx, sy = self.world_to_screen(0.0, yv)
             label = pyglet.text.Label(
                 f"{yv:.1f}",
                 font_size=11,
-                x=sx + tick_size + 4,  # чуть правее оси
+                x=sx + tick_size + 4,
                 y=sy,
                 anchor_x="left",
                 anchor_y="center",
@@ -303,7 +275,6 @@ class FieldSimulationWindow(pyglet.window.Window):
             )
             self.axes_drawables.append(label)
 
-        # Метка оси X
         sx_x, sy_x = self.world_to_screen(self.L, 0.0)
         label_x = pyglet.text.Label(
             "x",
@@ -318,7 +289,6 @@ class FieldSimulationWindow(pyglet.window.Window):
         )
         self.axes_drawables.append(label_x)
 
-        # Метка оси Y
         sx_y, sy_y = self.world_to_screen(0.0, self.L)
         label_y = pyglet.text.Label(
             "y",
@@ -457,10 +427,6 @@ class FieldSimulationWindow(pyglet.window.Window):
             group=self.group_legend,
         )
 
-    # =========================================================
-    #           ФИЗИКА
-    # =========================================================
-
     def compute_forces(self) -> list[tuple[float, float]]:
         n = len(self.charges)
         forces: list[tuple[float, float]] = [(0.0, 0.0) for _ in range(n)]
@@ -587,12 +553,12 @@ class FieldSimulationWindow(pyglet.window.Window):
         if v >= 0.0:
             t = v
             r = 255
-            g = int(255 * (1.0 - 0.6 * t))  # 255 -> 150
-            b = int(255 * (1.0 - t))        # 255 -> 0
+            g = int(255 * (1.0 - 0.6 * t))
+            b = int(255 * (1.0 - t))
         else:
             t = -v
-            r = int(255 * (1.0 - t))        # 255 -> 0
-            g = int(255 * (1.0 - 0.5 * t))  # 255 -> 128
+            r = int(255 * (1.0 - t))
+            g = int(255 * (1.0 - 0.5 * t))
             b = 255
         return max(0, min(255, r)), max(0, min(255, g)), max(0, min(255, b))
 
@@ -610,10 +576,6 @@ class FieldSimulationWindow(pyglet.window.Window):
             Ex += c.q * dx * inv_r3
             Ey += c.q * dy * inv_r3
         return Ex, Ey
-
-    # =========================================================
-    #           ЛИНИИ НАПРЯЖЁННОСТИ
-    # =========================================================
 
     def _integrate_streamline(self, start_x: float, start_y: float) -> list[tuple[float, float]]:
         points: list[tuple[float, float]] = []
@@ -680,10 +642,6 @@ class FieldSimulationWindow(pyglet.window.Window):
                     group=self.group_fieldlines,
                 )
                 self.streamline_shapes.append(line)
-
-    # =========================================================
-    #           ИГРОВАЯ ПЕТЛЯ
-    # =========================================================
 
     def update_simulation(self, dt: float) -> None:
         self.time_accumulator += dt
