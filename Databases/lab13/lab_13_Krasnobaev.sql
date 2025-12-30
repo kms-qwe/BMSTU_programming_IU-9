@@ -1,0 +1,122 @@
+USE master;
+GO
+
+ALTER DATABASE AirDB1 SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+GO
+DROP DATABASE IF EXISTS AirDB1;
+GO
+CREATE DATABASE AirDB1 ON (
+    NAME = AirDB1_dat,
+    FILENAME = '/var/opt/mssql/data/AirDB1_dat.mdf',
+    SIZE = 10MB,
+    MAXSIZE = UNLIMITED,
+    FILEGROWTH = 5%
+)
+LOG ON (
+    NAME = AirDB1_log,
+    FILENAME = '/var/opt/mssql/data/AirDB1_log.ldf',
+    SIZE = 5MB,
+    MAXSIZE = 25MB,
+    FILEGROWTH = 5MB
+);
+GO
+
+ALTER DATABASE AirDB2 SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+GO
+DROP DATABASE IF EXISTS AirDB2;
+GO
+CREATE DATABASE AirDB2 ON (
+    NAME = AirDB2_dat,
+    FILENAME = '/var/opt/mssql/data/AirDB2_dat.mdf',
+    SIZE = 10MB,
+    MAXSIZE = UNLIMITED,
+    FILEGROWTH = 5%
+)
+LOG ON (
+    NAME = AirDB2_log,
+    FILENAME = '/var/opt/mssql/data/AirDB2_log.ldf',
+    SIZE = 5MB,
+    MAXSIZE = 25MB,
+    FILEGROWTH = 5MB
+);
+GO
+
+USE AirDB1;
+GO
+
+DROP TABLE IF EXISTS dbo.AIRLINE_P1;
+GO
+CREATE TABLE dbo.AIRLINE_P1 (
+    AirlineID int NOT NULL,
+    IATA char(2) NOT NULL,
+    ICAO char(3) NOT NULL,
+    Name nvarchar(100) NOT NULL,
+    Country nvarchar(100) NOT NULL,
+    CONSTRAINT PK_AIRLINE_P1 PRIMARY KEY (AirlineID),
+    CONSTRAINT UQ_AIRLINE_P1_IATA UNIQUE (IATA),
+    CONSTRAINT UQ_AIRLINE_P1_ICAO UNIQUE (ICAO),
+    CONSTRAINT CK_AIRLINE_P1_Range CHECK (AirlineID < 1000)
+);
+GO
+
+USE AirDB2;
+GO
+
+DROP TABLE IF EXISTS dbo.AIRLINE_P2;
+GO
+CREATE TABLE dbo.AIRLINE_P2 (
+    AirlineID int NOT NULL,
+    IATA char(2) NOT NULL,
+    ICAO char(3) NOT NULL,
+    Name nvarchar(100) NOT NULL,
+    Country nvarchar(100) NOT NULL,
+    CONSTRAINT PK_AIRLINE_P2 PRIMARY KEY (AirlineID),
+    CONSTRAINT UQ_AIRLINE_P2_IATA UNIQUE (IATA),
+    CONSTRAINT UQ_AIRLINE_P2_ICAO UNIQUE (ICAO),
+    CONSTRAINT CK_AIRLINE_P2_Range CHECK (AirlineID >= 1000)
+);
+GO
+
+USE AirDB1;
+GO
+
+DROP VIEW IF EXISTS dbo.AIRLINE_View;
+GO
+CREATE VIEW dbo.AIRLINE_View
+AS
+    SELECT AirlineID, IATA, ICAO, Name, Country
+    FROM AirDB1.dbo.AIRLINE_P1
+    UNION ALL
+    SELECT AirlineID, IATA, ICAO, Name, Country
+    FROM AirDB2.dbo.AIRLINE_P2;
+GO
+
+INSERT INTO dbo.AIRLINE_View (AirlineID, IATA, ICAO, Name, Country)
+VALUES
+    (1, 'SU', 'AFL', N'Aeroflot', N'Russia'),
+    (2, 'AY', 'FIN', N'Finnair', N'Finland'),
+    (1000, 'LH', 'DLH', N'Lufthansa', N'Germany'),
+    (1001, 'BA', 'BAW', N'British Airways', N'United Kingdom');
+GO
+
+SELECT * FROM dbo.AIRLINE_View;
+GO
+SELECT * FROM AirDB1.dbo.AIRLINE_P1;
+GO
+SELECT * FROM AirDB2.dbo.AIRLINE_P2;
+GO
+
+UPDATE dbo.AIRLINE_View SET Country = N'UK' WHERE IATA = 'BA';
+GO
+
+DELETE FROM dbo.AIRLINE_View WHERE IATA = 'LH';
+GO
+
+INSERT INTO dbo.AIRLINE_View (AirlineID, IATA, ICAO, Name, Country)
+VALUES (1002, 'TK', 'THY', N'Turkish Airlines', N'Turkey');
+GO
+
+SELECT * FROM AirDB1.dbo.AIRLINE_P1;
+GO
+SELECT * FROM AirDB2.dbo.AIRLINE_P2;
+GO
