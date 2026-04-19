@@ -9,3 +9,20 @@ Programming Languages/C++/let6b/*
 .idea/
 target/
 **/.venv/
+**/__pycache__/
+**/*.pyc
+**/*.so
+Compiler Construction/module1/lab1/btpc64macOS
+Compiler Construction/module1/lab1/btpc64macOS-2
+Compiler Construction/module1/lab1/btpc64macOS-3
+Compiler Construction/module1/lab1/hello2
+Compiler Construction/module1/lab1/hello3
+Compiler Construction/module1/lab1/hello_bin
+Compiler Construction/module1/lab1/test110_3
+Compiler Construction/module1/lab1/test110_bin
+Development Of Parallel And Distributed Programs/lab4/lab4
+Development Of Parallel And Distributed Programs/lab5/lab5_1
+Development Of Parallel And Distributed Programs/lab5/lab5_2
+Optimal Code Generation/lab1/test
+Optimal Code Generation/lab2/compiler
+Optimal Code Generation/lab3/lab3

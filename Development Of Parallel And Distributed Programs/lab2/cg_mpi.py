@@ -1,27 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-MPI Conjugate Gradient (CG) solver for Ax = b
-
-Two variants:
-  --variant dup  : vectors x and b are duplicated on every process
-  --variant dist : vectors x and b are distributed across processes (like A)
-
-Matrix options:
-  --matrix model : implicit SPD matrix from the lab handout:
-                   A has 2.0 on the diagonal and 1.0 elsewhere (A = J + I).
-                   Matvec is computed without storing A: (A v) = sum(v) * 1 + v
-  --matrix dense : (for small N) local row-block of a dense matrix is stored.
-                   Use only to validate correctness; memory O(N^2).
-
-Problems:
-  --problem ones : "model problem with known solution": b = (N+1)*1, x* = 1
-  --problem sine : "model problem with arbitrary solution":
-                   u_i = sin(2π i / N), b = A u, so solution is u
-
-Stopping criterion:
-    ||r||_2 / ||b||_2 < eps
-"""
 from __future__ import annotations
 import numpy as np
 from mpi4py import MPI

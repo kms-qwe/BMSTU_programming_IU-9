@@ -1,0 +1,27 @@
+--- btpc64macOS.pas	2026-02-15 23:20:12
++++ btpc64macOS-2.pas	2026-02-15 23:21:41
+@@ -580,10 +580,24 @@
+  if not EOF then begin
+   read(CurrentChar);
+   CurrentColumn:=CurrentColumn+1;
++
+   if CurrentChar=#10 then begin
+    CurrentLine:=CurrentLine+1;
+    CurrentColumn:=0;
++  end;
++
++  if (CurrentColumn>110) and (CurrentChar<>#10) then begin
++   while (not EOF) and (CurrentChar<>#10) do begin
++    read(CurrentChar);
++   end;
++   if CurrentChar=#10 then begin
++    CurrentLine:=CurrentLine+1;
++    CurrentColumn:=0;
++   end else begin
++    CurrentChar:=#0;
++   end;
+   end;
++
+  end else begin
+   CurrentChar:=#0;
+  end;

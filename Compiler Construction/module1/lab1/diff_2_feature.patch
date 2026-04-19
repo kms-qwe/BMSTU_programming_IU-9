@@ -1,0 +1,23 @@
+--- btpc64macOS-2.pas	2026-02-15 23:21:41
++++ btpc64macOS-3.pas	2026-02-15 23:33:26
+@@ -532,7 +532,7 @@
+    Write('Invalid function return type');
+   end;
+   138:begin
+-   Write('Too many arguments then at forward declaration');
++   Write('Too many arguments then at forward declaration');                                                                                                 THIS_MUST_BE_IGNORED_AND_NOT_BREAK
+   end;
+   139:begin
+    Write('Argument name doesn''t match forward declaration');
+@@ -1273,7 +1273,10 @@
+ var y:integer;
+ begin
+  Factor(x);
+- while (CurrentSymbol=SymAND) or (CurrentSymbol=TokMul) or (CurrentSymbol=SymDIV) or (CurrentSymbol=SymMOD) do begin
++ while (CurrentSymbol=SymAND)
++  or (CurrentSymbol=TokMul)
++  or (CurrentSymbol=SymDIV)
++  or (CurrentSymbol=SymMOD) do begin
+   if CurrentSymbol=SymAND then begin
+    MustBe(TypeBOOL,x);
+   end else begin

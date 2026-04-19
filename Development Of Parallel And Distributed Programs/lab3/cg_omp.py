@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-OpenMP-like (Numba) Conjugate Gradient solver for Ax = b.
-Matrix kinds: model (A=J+I), dense (for small N).
-Problems: ones, sine, mix.
-"""
 from __future__ import annotations
 import argparse, math, numpy as np
 
