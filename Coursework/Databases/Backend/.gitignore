@@ -1,0 +1,6 @@
+.DS_Store
+.env
+build/.env
+app/bin/
+app/.cache/
+postgres_data/

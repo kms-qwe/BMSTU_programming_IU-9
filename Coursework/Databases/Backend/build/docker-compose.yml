@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: coffee-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrations:
+    build:
+      context: ..
+      dockerfile: build/migration.Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_SSL_MODE: ${DB_SSL_MODE}
+    restart: "no"
+
+  app:
+    build:
+      context: ..
+      dockerfile: build/Dockerfile
+    container_name: coffee-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    environment:
+      APP_ENV: ${APP_ENV}
+      HTTP_HOST: ${HTTP_HOST}
+      HTTP_PORT: ${HTTP_PORT}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_SSL_MODE: ${DB_SSL_MODE}
+    ports:
+      - "${HTTP_PORT}:${HTTP_PORT}"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

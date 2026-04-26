@@ -1,0 +1,19 @@
+package inventory
+
+import (
+	baserepos "coffee-shop-backend/app/internal/infra/repos"
+	"coffee-shop-backend/app/internal/utils"
+
+	sq "github.com/Masterminds/squirrel"
+)
+
+const inventoryOperationsTable = "inventory_operations"
+
+type Repo struct {
+	provider utils.IExecutorProvider
+	psql     sq.StatementBuilderType
+}
+
+func New(provider utils.IExecutorProvider) *Repo {
+	return &Repo{provider: provider, psql: baserepos.NewPSQL()}
+}
