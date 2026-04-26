@@ -3,6 +3,7 @@ package order
 import (
 	"time"
 
+	"coffee-shop-backend/app/internal/api/common"
 	"coffee-shop-backend/app/internal/models"
 	"coffee-shop-backend/app/internal/utils"
 	"coffee-shop-backend/app/pkg/apimodels"
@@ -15,6 +16,8 @@ import (
 // @Description Returns orders with employee, shift and item details.
 // @Tags order
 // @Produce json
+// @Param page query int false "Page number" default(1)
+// @Param page_size query int false "Page size" default(20)
 // @Param employee_id query string false "Employee ID"
 // @Param from query string false "RFC3339 from timestamp"
 // @Param to query string false "RFC3339 to timestamp"
@@ -23,7 +26,10 @@ import (
 // @Failure 500 {object} apimodels.ErrorResponse
 // @Router /api/order [get]
 func (a *API) listOrders(ctx *gin.Context) error {
-	page, pageSize := 1, 20
+	page, pageSize, err := common.ParsePagination(ctx, 1, 20)
+	if err != nil {
+		return err
+	}
 	var filter models.OrderFilter
 	filter.Page, filter.PageSize = page, pageSize
 	filter.EmployeeID = ctx.Query("employee_id")

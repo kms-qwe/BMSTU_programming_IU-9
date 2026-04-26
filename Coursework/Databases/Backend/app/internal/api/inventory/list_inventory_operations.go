@@ -3,6 +3,7 @@ package inventory
 import (
 	"time"
 
+	"coffee-shop-backend/app/internal/api/common"
 	"coffee-shop-backend/app/internal/models"
 	"coffee-shop-backend/app/internal/utils"
 	"coffee-shop-backend/app/pkg/apimodels"
@@ -15,6 +16,8 @@ import (
 // @Description Returns inventory operations with filters by employee, ingredient, type and date range.
 // @Tags inventory
 // @Produce json
+// @Param page query int false "Page number" default(1)
+// @Param page_size query int false "Page size" default(20)
 // @Param employee_id query string false "Employee ID"
 // @Param ingredient_id query string false "Ingredient ID"
 // @Param operation_type query string false "Operation type"
@@ -25,7 +28,11 @@ import (
 // @Failure 500 {object} apimodels.ErrorResponse
 // @Router /api/inventory/operation [get]
 func (a *API) listInventoryOperations(ctx *gin.Context) error {
-	filter := models.InventoryOperationFilter{Page: 1, PageSize: 20, EmployeeID: ctx.Query("employee_id"), IngredientID: ctx.Query("ingredient_id"), OperationType: ctx.Query("operation_type")}
+	page, pageSize, err := common.ParsePagination(ctx, 1, 20)
+	if err != nil {
+		return err
+	}
+	filter := models.InventoryOperationFilter{Page: page, PageSize: pageSize, EmployeeID: ctx.Query("employee_id"), IngredientID: ctx.Query("ingredient_id"), OperationType: ctx.Query("operation_type")}
 	if raw := ctx.Query("from"); raw != "" {
 		t, err := time.Parse(time.RFC3339, raw)
 		if err != nil {

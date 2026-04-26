@@ -427,10 +427,10 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
-  /api/report/sales/excel:
+  /api/report/sales/pdf:
     post:
       tags: [report]
-      summary: Сформировать Excel-отчет по продажам
+      summary: Сформировать PDF-отчет по продажам
       requestBody:
         required: true
         content:
@@ -439,16 +439,16 @@ paths:
               $ref: '#/components/schemas/TimeRangeRequest'
       responses:
         '200':
-          $ref: '#/components/responses/ExcelFile'
+          $ref: '#/components/responses/PDFFile'
         '400':
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalError'
 
-  /api/report/employees/excel:
+  /api/report/employees/pdf:
     post:
       tags: [report]
-      summary: Сформировать Excel-отчет по сотрудникам
+      summary: Сформировать PDF-отчет по сотрудникам
       requestBody:
         required: true
         content:
@@ -457,16 +457,16 @@ paths:
               $ref: '#/components/schemas/TimeRangeRequest'
       responses:
         '200':
-          $ref: '#/components/responses/ExcelFile'
+          $ref: '#/components/responses/PDFFile'
         '400':
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalError'
 
-  /api/report/inventory/excel:
+  /api/report/inventory/pdf:
     post:
       tags: [report]
-      summary: Сформировать Excel-отчет по складу
+      summary: Сформировать PDF-отчет по складу
       requestBody:
         required: true
         content:
@@ -475,16 +475,16 @@ paths:
               $ref: '#/components/schemas/InventoryReportRequest'
       responses:
         '200':
-          $ref: '#/components/responses/ExcelFile'
+          $ref: '#/components/responses/PDFFile'
         '400':
           $ref: '#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/InternalError'
 
-  /api/report/menu-popularity/excel:
+  /api/report/menu-popularity/pdf:
     post:
       tags: [report]
-      summary: Сформировать Excel-отчет по популярности меню
+      summary: Сформировать PDF-отчет по популярности меню
       requestBody:
         required: true
         content:
@@ -493,7 +493,7 @@ paths:
               $ref: '#/components/schemas/TimeRangeRequest'
       responses:
         '200':
-          $ref: '#/components/responses/ExcelFile'
+          $ref: '#/components/responses/PDFFile'
         '400':
           $ref: '#/components/responses/ValidationError'
         '500':
@@ -521,10 +521,10 @@ components:
         type: string
 
   responses:
-    ExcelFile:
-      description: Excel файл
+    PDFFile:
+      description: PDF файл
       content:
-        application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+        application/pdf:
           schema:
             type: string
             format: binary

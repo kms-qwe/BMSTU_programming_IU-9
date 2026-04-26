@@ -97,7 +97,5 @@ func main() {
 		sumErr += math.Pow(z-y[i], 2)
 	}
 
-	Delta := math.Sqrt(sumErr / n)
-
-	fmt.Printf("\nСреднеквадратичное отклонение Δ = %.6f\n", Delta)
+	fmt.Printf("\nСумма квадратов отклонений Δ = %.6f\n", sumErr)
 }

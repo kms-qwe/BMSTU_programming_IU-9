@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"coffee-shop-backend/app/internal/utils"
 	"coffee-shop-backend/app/pkg/apimodels"
@@ -44,9 +45,32 @@ func DecodeBody(ctx *gin.Context, target any) error {
 	return nil
 }
 
-func Excel(ctx *gin.Context, fileName string, content []byte) error {
-	ctx.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+func ParsePagination(ctx *gin.Context, defaultPage, defaultPageSize int) (int, int, error) {
+	page := defaultPage
+	pageSize := defaultPageSize
+
+	if raw := ctx.Query("page"); raw != "" {
+		value, err := strconv.Atoi(raw)
+		if err != nil || value <= 0 {
+			return 0, 0, utils.ValidationError("invalid query parameter", map[string]any{"field": "page"})
+		}
+		page = value
+	}
+
+	if raw := ctx.Query("page_size"); raw != "" {
+		value, err := strconv.Atoi(raw)
+		if err != nil || value <= 0 {
+			return 0, 0, utils.ValidationError("invalid query parameter", map[string]any{"field": "page_size"})
+		}
+		pageSize = value
+	}
+
+	return page, pageSize, nil
+}
+
+func PDF(ctx *gin.Context, fileName string, content []byte) error {
+	ctx.Header("Content-Type", "application/pdf")
 	ctx.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%q", fileName))
-	ctx.Data(http.StatusOK, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", content)
+	ctx.Data(http.StatusOK, "application/pdf", content)
 	return nil
 }

@@ -45,7 +45,23 @@ migration-create: install-goose
 .PHONY: up
 up:
 	cp build/.env.example build/.env 2>/dev/null || true
-	docker compose --env-file build/.env -f build/docker-compose.yml up --build
+	docker compose --env-file build/.env -f build/docker-compose.yml up --build -d
+
+.PHONY: logs
+logs:
+	docker compose --env-file build/.env -f build/docker-compose.yml logs -f
+
+.PHONY: ps
+ps:
+	docker compose --env-file build/.env -f build/docker-compose.yml ps
+
+.PHONY: create-test-user
+create-test-user:
+	./scripts/create_employee.sh "Иван Тестов" "+79990000000" "ivan" "123456"
+
+.PHONY: seed-demo-data
+seed-demo-data:
+	python3 ./scripts/seed_demo_data.py --orders $${SEED_ORDERS:-1000}
 
 .PHONY: down
 down:

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"coffee-shop-backend/app/internal/models"
-	"github.com/xuri/excelize/v2"
 )
 
 func (s *Service) BuildEmployeeReport(ctx context.Context, filter models.ReportFilter) ([]byte, error) {
@@ -12,28 +11,59 @@ func (s *Service) BuildEmployeeReport(ctx context.Context, filter models.ReportF
 	if err != nil {
 		return nil, err
 	}
-	file := excelize.NewFile()
-	file.SetSheetName("Sheet1", "Employees summary")
-	rows := [][]any{{"Сотрудник", "Количество смен", "Количество заказов", "Выручка", "Средний чек"}}
+
+	pdf := newPDFDocument("Отчет по сотрудникам", true)
+	names := uniqueStrings(extractEmployeeNames(data))
+	addKeyValueSection(pdf, "Параметры отчета", []reportMetric{
+		{Label: "Период", Value: filter.From.Format("2006-01-02 15:04 UTC") + " .. " + filter.To.Format("2006-01-02 15:04 UTC")},
+		{Label: "Сотрудник", Value: employeeFilterLabel(filter, names)},
+	})
+
+	totalShifts := 0
+	totalOrders := 0
+	totalRevenue := 0.0
 	for _, row := range data.Summaries {
-		rows = append(rows, []any{row.EmployeeName, row.ShiftCount, row.OrdersCount, row.Revenue, row.AverageBill})
+		totalShifts += row.ShiftCount
+		totalOrders += row.OrdersCount
+		totalRevenue += row.Revenue
 	}
-	writeRows(file, "Employees summary", rows)
-	file.NewSheet("Employee orders")
-	orderRows := [][]any{{"Дата", "Сотрудник", "Заказ", "Сумма"}}
+
+	addKeyValueSection(pdf, "Сводные метрики", []reportMetric{
+		{Label: "Сотрудников в выборке", Value: formatInt(len(data.Summaries))},
+		{Label: "Всего смен", Value: formatInt(totalShifts)},
+		{Label: "Всего заказов", Value: formatInt(totalOrders)},
+		{Label: "Общая выручка", Value: formatMoney(totalRevenue)},
+		{Label: "Средний чек по выборке", Value: formatMoney(safeDivide(totalRevenue, float64(maxInt(totalOrders, 1))))},
+		{Label: "Лидер по выручке", Value: topEmployeeByRevenue(data.Summaries)},
+		{Label: "Лидер по числу заказов", Value: topEmployeeByOrders(data.Summaries)},
+		{Label: "Самая длинная смена", Value: longestShift(data.Shifts)},
+	})
+
+	summaryRows := make([][]string, 0, len(data.Summaries))
+	for _, row := range data.Summaries {
+		summaryRows = append(summaryRows, []string{
+			row.EmployeeName,
+			formatInt(row.ShiftCount),
+			formatInt(row.OrdersCount),
+			formatMoney(row.Revenue),
+			formatMoney(row.AverageBill),
+		})
+	}
+	addTable(pdf, "Сводка по сотрудникам", []string{"Сотрудник", "Смены", "Заказы", "Выручка", "Средний чек"}, []float64{85, 25, 25, 35, 35}, toStringRows(20, summaryRows))
+
+	return writePDF(pdf)
+}
+
+func extractEmployeeNames(data *models.EmployeeReportData) []string {
+	names := make([]string, 0, len(data.Summaries)+len(data.Orders)+len(data.Shifts))
+	for _, row := range data.Summaries {
+		names = append(names, row.EmployeeName)
+	}
 	for _, row := range data.Orders {
-		orderRows = append(orderRows, []any{row.CreatedAt, row.EmployeeName, row.OrderID, row.TotalPrice})
+		names = append(names, row.EmployeeName)
 	}
-	writeRows(file, "Employee orders", orderRows)
-	file.NewSheet("Shifts")
-	shiftRows := [][]any{{"Сотрудник", "Открытие смены", "Закрытие смены", "Длительность"}}
 	for _, row := range data.Shifts {
-		closedAt := any("")
-		if row.ClosedAt != nil {
-			closedAt = *row.ClosedAt
-		}
-		shiftRows = append(shiftRows, []any{row.EmployeeName, row.OpenedAt, closedAt, row.Duration})
+		names = append(names, row.EmployeeName)
 	}
-	writeRows(file, "Shifts", shiftRows)
-	return writeWorkbook(file)
+	return names
 }

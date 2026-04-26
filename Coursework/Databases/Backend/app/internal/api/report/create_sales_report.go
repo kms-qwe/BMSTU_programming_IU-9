@@ -11,15 +11,15 @@ import (
 
 // createSalesReport godoc
 // @Summary Create sales report
-// @Description Builds an Excel sales report for the selected period.
+// @Description Builds a PDF sales report for the selected period.
 // @Tags report
 // @Accept json
-// @Produce application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+// @Produce application/pdf
 // @Param request body apimodels.TimeRangeRequest true "Sales report payload"
 // @Success 200 {file} file
 // @Failure 400 {object} apimodels.ErrorResponse
 // @Failure 500 {object} apimodels.ErrorResponse
-// @Router /api/report/sales/excel [post]
+// @Router /api/report/sales/pdf [post]
 func (a *API) createSalesReport(ctx *gin.Context) error {
 	var request apimodels.TimeRangeRequest
 	if err := common.DecodeBody(ctx, &request); err != nil {
@@ -33,5 +33,5 @@ func (a *API) createSalesReport(ctx *gin.Context) error {
 	if err != nil {
 		return err
 	}
-	return common.Excel(ctx, fmt.Sprintf("sales-report-%s-%s.xlsx", filter.From.Format("2006-01-02"), filter.To.Format("2006-01-02")), content)
+	return common.PDF(ctx, fmt.Sprintf("sales-report-%s-%s.pdf", filter.From.Format("2006-01-02"), filter.To.Format("2006-01-02")), content)
 }

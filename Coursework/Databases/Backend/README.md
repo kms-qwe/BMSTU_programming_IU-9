@@ -32,7 +32,31 @@ cp build/.env.example build/.env
 make up
 ```
 
-3. Дождаться старта сервиса.
+`make up` запускает контейнеры в фоне.
+
+3. Посмотреть статус контейнеров:
+
+```bash
+make ps
+```
+
+4. При необходимости посмотреть логи:
+
+```bash
+make logs
+```
+
+5. При необходимости создать тестового сотрудника:
+
+```bash
+make create-test-user
+```
+
+6. Для полного наполнения демо-данными:
+
+```bash
+make seed-demo-data
+```
 
 По умолчанию API будет доступен по адресу:
 
@@ -67,7 +91,15 @@ make down
 - `make migration-create name=<migration_name>`:
   создает новую SQL-миграцию через `goose` в папке `migrations`
 - `make up`:
-  поднимает PostgreSQL, миграции и приложение через `docker compose`
+  поднимает PostgreSQL, миграции и приложение через `docker compose` в фоне
+- `make logs`:
+  показывает и подписывается на логи контейнеров
+- `make ps`:
+  показывает статус контейнеров
+- `make create-test-user`:
+  создает тестового сотрудника `ivan / 123456` в уже поднятой базе
+- `make seed-demo-data`:
+  очищает БД и заново заполняет ее демо-данными через API, включая сотрудников, ингредиенты, меню, складские операции, смены и примерно 1000 заказов
 - `make down`:
   останавливает контейнеры и удаляет volume базы данных
 
@@ -78,6 +110,10 @@ make install-tools
 make migration-create name=add_orders_indexes
 make swagger
 make up
+make ps
+make create-test-user
+make seed-demo-data
+make logs
 ```
 
 ## Локальный запуск без Docker
@@ -97,7 +133,47 @@ go run ./cmd/app
 ./scripts/create_employee.sh "Иван Петров" "+79990000000" "ivan" "123456"
 ```
 
+Для стандартного тестового пользователя можно использовать сокращение:
+
+```bash
+make create-test-user
+```
+
 Скрипт использует настройки из `build/.env` и выполняет SQL внутри контейнера с PostgreSQL.
+
+## Наполнение демо-данными
+
+Для большого набора тестовых данных есть скрипт:
+
+```bash
+make seed-demo-data
+```
+
+Что делает скрипт:
+
+- полностью очищает прикладные таблицы БД
+- создает нескольких сотрудников
+- создает ингредиенты с начальными остатками
+- создает разнообразное меню
+- создает ручные складские операции
+- создает много смен у разных сотрудников
+- создает примерно `1000` заказов через API
+- оставляет одну активную смену открытой для дальнейшего тестирования
+
+Если нужно другое количество заказов:
+
+```bash
+SEED_ORDERS=1500 make seed-demo-data
+```
+
+После выполнения можно входить любым из тестовых пользователей с паролем `123456`, например:
+
+- `ivan`
+- `anna`
+- `petr`
+- `maria`
+- `alex`
+- `olga`
 
 ## Как слать запросы
 
@@ -153,17 +229,17 @@ curl -X POST http://localhost:8080/api/order \
   }'
 ```
 
-Скачать Excel-отчет:
+Скачать PDF-отчет:
 
 ```bash
-curl -X POST http://localhost:8080/api/report/sales/excel \
+curl -X POST http://localhost:8080/api/report/sales/pdf \
   -H "Content-Type: application/json" \
   -d '{
     "from": "2026-04-01T00:00:00Z",
     "to": "2026-04-26T23:59:59Z",
     "employee_id": null
   }' \
-  --output sales-report.xlsx
+  --output sales-report.pdf
 ```
 
 ## Документация API
@@ -242,7 +318,7 @@ make migration-create name=create_suppliers_table
 
 ### Report
 
-- `POST /api/report/sales/excel`
-- `POST /api/report/employees/excel`
-- `POST /api/report/inventory/excel`
-- `POST /api/report/menu-popularity/excel`
+- `POST /api/report/sales/pdf`
+- `POST /api/report/employees/pdf`
+- `POST /api/report/inventory/pdf`
+- `POST /api/report/menu-popularity/pdf`
